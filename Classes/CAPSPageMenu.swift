@@ -396,13 +396,23 @@ open class CAPSPageMenu: UIViewController, UIScrollViewDelegate, UIGestureRecogn
         controllerScrollView.contentSize = CGSize(width: self.view.frame.width * CGFloat(controllerArray.count), height: 0.0)
         
         var index : CGFloat = 0.0
+          addStartPage();
         
-        for controller in controllerArray {
+        var localControlArray = controllerArray;
+        
+        if(UIView.appearance().semanticContentAttribute == .forceRightToLeft){
+            
+            localControlArray.reverse();
+        }
+        
+        for controller in localControlArray {
+            
             if index == 0.0 {
                 
                 // Add first two controllers to scrollview and as child view controller
-                addStartPage();
+                //addStartPage();
             }
+            
             
             // Set up menu item for menu scroll view
             var menuItemFrame : CGRect = CGRect()
@@ -771,10 +781,24 @@ open class CAPSPageMenu: UIViewController, UIScrollViewDelegate, UIGestureRecogn
         pagesAddedDictionary.removeAll(keepingCapacity: false)
     }
     
+    private func translatePageIndex(index : Int) -> Int{
+       
+        var result = index;
+        
+        if(UIView.appearance().semanticContentAttribute == .forceRightToLeft){
+            
+             result = controllerArray.count - index - 1;
+        }
+        
+        return result;
+    }
     
     // MARK: - Handle Selection Indicator
     func moveSelectionIndicator(_ pageIndex: Int) {
         if pageIndex >= 0 && pageIndex < controllerArray.count {
+            
+            let translatedIndex = translatePageIndex(index: pageIndex);
+            
             UIView.animate(withDuration: 0.15, animations: { () -> Void in
                 var selectionIndicatorWidth : CGFloat = self.selectionIndicatorView.frame.width
                 var selectionIndicatorX : CGFloat = 0.0
@@ -783,8 +807,8 @@ open class CAPSPageMenu: UIViewController, UIScrollViewDelegate, UIGestureRecogn
                     selectionIndicatorX = CGFloat(pageIndex) * (self.view.frame.width / CGFloat(self.controllerArray.count))
                     selectionIndicatorWidth = self.view.frame.width / CGFloat(self.controllerArray.count)
                 } else if self.menuItemWidthBasedOnTitleTextWidth {
-                    selectionIndicatorWidth = self.menuItemWidths[pageIndex]
-                    selectionIndicatorX = self.menuItems[pageIndex].frame.minX
+                    selectionIndicatorWidth = self.menuItemWidths[translatedIndex]
+                    selectionIndicatorX = self.menuItems[translatedIndex].frame.minX
                 } else {
                     if self.centerMenuItems && pageIndex == 0 {
                         selectionIndicatorX = self.startingMenuMargin + self.menuMargin
@@ -804,8 +828,14 @@ open class CAPSPageMenu: UIViewController, UIScrollViewDelegate, UIGestureRecogn
                 // Switch newly selected menu item title label to selected color and old one to unselected color
                 if self.menuItems.count > 0 {
                     if self.menuItems[self.lastPageIndex].titleLabel != nil && self.menuItems[self.currentPageIndex].titleLabel != nil {
-                        self.menuItems[self.lastPageIndex].titleLabel!.textColor = self.unselectedMenuItemLabelColor
-                        self.menuItems[self.currentPageIndex].titleLabel!.textColor = self.selectedMenuItemLabelColor
+                        
+                        /*
+                         self.menuItems[self.lastPageIndex].titleLabel!.textColor = self.unselectedMenuItemLabelColor
+                         self.menuItems[self.currentPageIndex].titleLabel!.textColor = self.selectedMenuItemLabelColor
+                         */
+                        //translatePageIndex(index: self.lastPageIndex)
+                        self.menuItems[self.translatePageIndex(index: self.lastPageIndex)].titleLabel!.textColor = self.unselectedMenuItemLabelColor
+                        self.menuItems[self.translatePageIndex(index: self.currentPageIndex)].titleLabel!.textColor = self.selectedMenuItemLabelColor
                     }
                 }
             })
