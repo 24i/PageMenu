@@ -93,7 +93,7 @@ open class CAPSPageMenu: UIViewController, UIScrollViewDelegate, UIGestureRecogn
     
     let menuScrollView = UIScrollView()
     let controllerScrollView = UIScrollView()
-    var controllerArray : [UIViewController] = []
+    private var controllerArray : [UIViewController] = []
     var menuItems : [MenuItemView] = []
     var menuItemWidths : [CGFloat] = []
     
@@ -169,9 +169,18 @@ open class CAPSPageMenu: UIViewController, UIScrollViewDelegate, UIGestureRecogn
     public init(viewControllers: [UIViewController], frame: CGRect, options: [String: AnyObject]?) {
         super.init(nibName: nil, bundle: nil)
         
-        controllerArray = viewControllers
+        setViewControllers(viewControllers: viewControllers);
         
         self.view.frame = frame
+    }
+    
+    private func setViewControllers(viewControllers: [UIViewController]){
+        
+        controllerArray = viewControllers;
+        
+        if(UIView.appearance().semanticContentAttribute == .forceRightToLeft){
+            controllerArray.reverse();
+        }
     }
     
     public convenience init(viewControllers: [UIViewController], frame: CGRect, pageMenuOptions: [CAPSPageMenuOption]?) {
@@ -323,6 +332,39 @@ open class CAPSPageMenu: UIViewController, UIScrollViewDelegate, UIGestureRecogn
         menuScrollView.backgroundColor = scrollMenuBackgroundColor
     }
     
+    private func addStartPage(){
+        
+        if(UIView.appearance().semanticContentAttribute == .forceRightToLeft){
+         
+            let lastPageIndex = max(0, controllerArray.count - 2);
+            addPageAtIndex(lastPageIndex);
+            
+            DispatchQueue.main.async(execute: {() -> Void in
+                
+                self.controllerScrollView.setContentOffset(CGPoint(x: CGFloat( self.controllerArray.count - 1) * self.controllerScrollView.frame.size.width, y: self.controllerScrollView.contentOffset.y), animated: false);
+            });
+            
+        }else{
+            
+            addPageAtIndex(0);
+        }
+    }
+    
+    private func getMenuItemFrame(index : CGFloat) -> CGRect{
+        
+        var x : CGFloat;
+        
+        if(UIView.appearance().semanticContentAttribute == .forceRightToLeft){
+            
+            x = self.view.frame.width - menuItemWidth - (totalMenuItemWidthIfDifferentWidths + menuMargin + (menuMargin * index));
+        }else{
+            
+            x = totalMenuItemWidthIfDifferentWidths + menuMargin + (menuMargin * index);
+        }
+
+        return CGRect(x: x, y: 0.0, width: menuItemWidth, height: menuHeight)
+    }
+    
     func configureUserInterface() {
         // Add tap gesture recognizer to controller scroll view to recognize menu item selection
         let menuItemTapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(CAPSPageMenu.handleMenuItemTap(_:)))
@@ -357,8 +399,9 @@ open class CAPSPageMenu: UIViewController, UIScrollViewDelegate, UIGestureRecogn
         
         for controller in controllerArray {
             if index == 0.0 {
+                
                 // Add first two controllers to scrollview and as child view controller
-                addPageAtIndex(0)
+                addStartPage();
             }
             
             // Set up menu item for menu scroll view
@@ -382,8 +425,8 @@ open class CAPSPageMenu: UIViewController, UIScrollViewDelegate, UIGestureRecogn
                 let itemWidthRect : CGRect = (titleText as NSString).boundingRect(with: CGSize(width: 1000, height: 1000), options: NSStringDrawingOptions.usesLineFragmentOrigin, attributes: [NSFontAttributeName:menuItemFont], context: nil)
                 
                 menuItemWidth = itemWidthRect.width
-                
-                menuItemFrame = CGRect(x: totalMenuItemWidthIfDifferentWidths + menuMargin + (menuMargin * index), y: 0.0, width: menuItemWidth, height: menuHeight)
+              
+                menuItemFrame = getMenuItemFrame(index: index);
                 
                 totalMenuItemWidthIfDifferentWidths += itemWidthRect.width
                 menuItemWidths.append(itemWidthRect.width)
@@ -563,6 +606,7 @@ open class CAPSPageMenu: UIViewController, UIScrollViewDelegate, UIGestureRecogn
                                 
                                 if (CGFloat(startingPageForScroll) * scrollView.frame.width > scrollView.contentOffset.x) {
                                     newScrollDirection = .right
+                                    
                                 } else if (CGFloat(startingPageForScroll) * scrollView.frame.width < scrollView.contentOffset.x) {
                                     newScrollDirection = .left
                                 }
@@ -1032,3 +1076,4 @@ open class CAPSPageMenu: UIViewController, UIScrollViewDelegate, UIGestureRecogn
         }
     }
 }
+
