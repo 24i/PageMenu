@@ -354,13 +354,7 @@ open class CAPSPageMenu: UIViewController, UIScrollViewDelegate, UIGestureRecogn
             addPageAtIndex(0);
         }
     }
-    
-    private func getMenuItemFrame(index : CGFloat) -> CGRect{
-        
-        var x = totalMenuItemWidthIfDifferentWidths + menuMargin + (menuMargin * index);
 
-        return CGRect(x: x, y: 0.0, width: menuItemWidth, height: menuHeight)
-    }
     
     func configureUserInterface() {
         // Add tap gesture recognizer to controller scroll view to recognize menu item selection
@@ -420,7 +414,8 @@ open class CAPSPageMenu: UIViewController, UIScrollViewDelegate, UIGestureRecogn
                 
                 menuItemWidth = itemWidthRect.width
               
-                menuItemFrame = getMenuItemFrame(index: index);
+                let x = totalMenuItemWidthIfDifferentWidths + menuMargin + (menuMargin * index);
+                menuItemFrame = CGRect(x: x, y: 0.0, width: menuItemWidth, height: menuHeight)
                 
                 totalMenuItemWidthIfDifferentWidths += itemWidthRect.width
                 menuItemWidths.append(itemWidthRect.width)
@@ -493,8 +488,6 @@ open class CAPSPageMenu: UIViewController, UIScrollViewDelegate, UIGestureRecogn
         // Set new content size for menu scroll view if needed
         if menuItemWidthBasedOnTitleTextWidth {
             menuScrollView.contentSize = CGSize(width: (totalMenuItemWidthIfDifferentWidths + menuMargin) + CGFloat(controllerArray.count) * menuMargin, height: menuHeight)
-            
-            ///menuScrollView.contentSize = CGSize(width: 600, height: menuHeight)
         }
         
         // Set selected color for title label of selected menu item
