@@ -9,4 +9,5 @@ Pod::Spec.new do |s|
   s.platform     = :ios, '9.0'
   s.source_files = 'Classes/*'
   s.requires_arc = true
+  s.swift_version = '4.2'
 end
