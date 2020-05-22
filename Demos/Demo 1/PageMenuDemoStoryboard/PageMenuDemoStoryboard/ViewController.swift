@@ -25,8 +25,8 @@ class ViewController: UIViewController {
         self.navigationController?.navigationBar.tintColor = UIColor.white
         self.navigationController?.navigationBar.titleTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.orange]
         
-        self.navigationItem.leftBarButtonItem = UIBarButtonItem(title: "<-", style: UIBarButtonItem.Style.done, target: self, action: Selector("didTapGoToLeft"))
-        self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "->", style: UIBarButtonItem.Style.done, target: self, action: Selector("didTapGoToRight"))
+        self.navigationItem.leftBarButtonItem = UIBarButtonItem(title: "<-", style: UIBarButtonItem.Style.done, target: self, action: #selector(didTapGoToLeft))
+        self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "->", style: UIBarButtonItem.Style.done, target: self, action: #selector(didTapGoToRight))
         
         // MARK: - Scroll menu setup
         
@@ -67,7 +67,7 @@ class ViewController: UIViewController {
         pageMenu!.didMove(toParent: self)
     }
     
-    func didTapGoToLeft() {
+    @objc func didTapGoToLeft() {
         let currentIndex = pageMenu!.currentPageIndex
         
         if currentIndex > 0 {
@@ -75,7 +75,7 @@ class ViewController: UIViewController {
         }
     }
     
-    func didTapGoToRight() {
+    @objc func didTapGoToRight() {
         let currentIndex = pageMenu!.currentPageIndex
         
 //        if currentIndex < pageMenu!.controllerArray.count {
